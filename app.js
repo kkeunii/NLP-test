@@ -1,8 +1,10 @@
 (function () {
   const chapterStore = window.quizChapterData || {};
   const chapterOrder = Array.from({ length: 9 }, (_, index) => index + 1);
+  const STORAGE_KEY = "nlp-quiz-progress-v1";
   const state = {
     selectedChapters: new Set(),
+    loadedChapters: [],
     activeQuestions: [],
     results: {},
   };
@@ -29,10 +31,19 @@
   const correctCount = document.getElementById("correct-count");
   const accuracyCount = document.getElementById("accuracy-count");
   const statusNote = document.getElementById("status-note");
+  const wrongReviewCount = document.getElementById("wrong-review-count");
+  const wrongReviewList = document.getElementById("wrong-review-list");
+  const wrongReviewEmptyState = document.getElementById("wrong-review-empty-state");
 
+  restorePersistedState();
   renderChapterSelectors();
+  syncChapterInputs();
   updateSelectionSummary();
-  updateStats();
+  if (state.loadedChapters.length > 0) {
+    loadQuestionsForChapters(state.loadedChapters, { restored: true });
+  } else {
+    updateStats();
+  }
 
   selectAllButton.addEventListener("click", function () {
     chapterOrder.forEach(function (chapterNumber) {
@@ -40,12 +51,14 @@
     });
     syncChapterInputs();
     updateSelectionSummary();
+    persistState();
   });
 
   clearAllButton.addEventListener("click", function () {
     state.selectedChapters.clear();
     syncChapterInputs();
     updateSelectionSummary();
+    persistState();
   });
 
   startButton.addEventListener("click", function () {
@@ -54,6 +67,7 @@
 
   resetProgressButton.addEventListener("click", function () {
     state.results = {};
+    persistState();
     updateStats();
     rerenderCurrentQuiz();
   });
@@ -72,6 +86,7 @@
       input.type = "checkbox";
       input.id = "chapter-" + chapterNumber;
       input.value = String(chapterNumber);
+      input.checked = state.selectedChapters.has(chapterNumber);
       input.addEventListener("change", function (event) {
         if (event.target.checked) {
           state.selectedChapters.add(chapterNumber);
@@ -79,6 +94,7 @@
           state.selectedChapters.delete(chapterNumber);
         }
         updateSelectionSummary();
+        persistState();
       });
 
       const label = document.createElement("label");
@@ -158,14 +174,21 @@
 
     if (selected.length === 0) {
       state.activeQuestions = [];
+      state.loadedChapters = [];
+      persistState();
       renderQuiz();
       statusNote.textContent = "장을 하나 이상 선택해야 문제를 불러올 수 있습니다.";
       return;
     }
 
+    loadQuestionsForChapters(selected);
+  }
+
+  function loadQuestionsForChapters(chapterNumbers, options) {
+    const normalizedChapters = normalizeChapterNumbers(chapterNumbers);
     const mergedQuestions = [];
 
-    selected.forEach(function (chapterNumber) {
+    normalizedChapters.forEach(function (chapterNumber) {
       const chapterData = getChapterData(chapterNumber);
       chapterData.questions.forEach(function (question, questionIndex) {
         mergedQuestions.push({
@@ -178,18 +201,23 @@
       });
     });
 
+    state.loadedChapters = normalizedChapters;
     state.activeQuestions = mergedQuestions;
+    persistState();
     renderQuiz();
 
     if (mergedQuestions.length === 0) {
       statusNote.textContent =
         "선택한 장에는 아직 문제가 없습니다. 장별 파일에 문제를 추가하면 바로 나타납니다.";
     } else {
+      const restored = options && options.restored === true;
       statusNote.textContent =
-        selected.length +
+        normalizedChapters.length +
         "개 장에서 " +
         mergedQuestions.length +
-        "문제를 불러왔습니다. 객관식은 즉시 채점되고, 서술형은 키워드 기준 참고 채점과 모범답안이 표시됩니다.";
+        "문제를 불러왔습니다. " +
+        (restored ? "이전 풀이 상태도 함께 복원했습니다. " : "") +
+        "객관식은 즉시 채점되고, 서술형은 키워드 기준 참고 채점과 모범답안을 표시합니다.";
     }
   }
 
@@ -199,6 +227,7 @@
     if (state.activeQuestions.length === 0) {
       emptyState.style.display = "block";
       updateStats();
+      renderWrongAnswerSection();
       return;
     }
 
@@ -212,6 +241,7 @@
 
     quizList.appendChild(fragment);
     updateStats();
+    renderWrongAnswerSection();
   }
 
   function rerenderCurrentQuiz() {
@@ -221,6 +251,7 @@
   function buildQuestionCard(question, index) {
     const card = document.createElement("article");
     card.className = "quiz-card";
+    card.id = "question-card-" + question.uid;
 
     const existingResult = state.results[question.uid];
     if (existingResult) {
@@ -538,6 +569,110 @@
     return resultBox;
   }
 
+  function renderWrongAnswerSection() {
+    if (!wrongReviewList || !wrongReviewEmptyState || !wrongReviewCount) {
+      return;
+    }
+
+    wrongReviewList.innerHTML = "";
+
+    const wrongQuestions = state.activeQuestions.filter(function (question) {
+      return state.results[question.uid] && state.results[question.uid].isCorrect === false;
+    });
+
+    wrongReviewCount.textContent = wrongQuestions.length + "문제";
+
+    if (wrongQuestions.length === 0) {
+      wrongReviewEmptyState.style.display = "block";
+      return;
+    }
+
+    wrongReviewEmptyState.style.display = "none";
+    const fragment = document.createDocumentFragment();
+
+    wrongQuestions.forEach(function (question, index) {
+      fragment.appendChild(buildWrongAnswerCard(question, index));
+    });
+
+    wrongReviewList.appendChild(fragment);
+  }
+
+  function buildWrongAnswerCard(question, index) {
+    const result = state.results[question.uid];
+    const card = document.createElement("article");
+    card.className = "review-card";
+
+    const header = document.createElement("div");
+    header.className = "review-header";
+
+    const title = document.createElement("div");
+    title.className = "review-title";
+
+    const badge = document.createElement("span");
+    badge.className = "question-badge";
+    badge.textContent = question.chapterNumber + "장";
+
+    const label = document.createElement("span");
+    label.textContent = "오답 " + (index + 1);
+
+    title.appendChild(badge);
+    title.appendChild(label);
+    header.appendChild(title);
+
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "type-badge";
+    typeBadge.textContent = typeLabels[question.type] || "문제";
+    header.appendChild(typeBadge);
+
+    const body = document.createElement("div");
+    body.className = "review-body";
+
+    const prompt = document.createElement("p");
+    prompt.className = "review-prompt";
+    prompt.textContent = question.prompt || "";
+
+    const submitted = document.createElement("p");
+    submitted.className = "review-copy";
+    submitted.innerHTML =
+      "<strong>내 답안:</strong> " + escapeHtml(getSubmittedText(question, result));
+
+    const answer = document.createElement("p");
+    answer.className = "review-copy";
+    answer.innerHTML =
+      "<strong>정답:</strong> " + escapeHtml(getAnswerText(question));
+
+    const explanation = document.createElement("p");
+    explanation.className = "review-copy";
+    explanation.innerHTML =
+      "<strong>해설:</strong> " +
+      escapeHtml(question.explanation || "아직 해설이 입력되지 않았습니다.");
+
+    const actions = document.createElement("div");
+    actions.className = "review-actions";
+
+    const jumpButton = document.createElement("button");
+    jumpButton.type = "button";
+    jumpButton.className = "link-button";
+    jumpButton.textContent = "원문제로 이동";
+    jumpButton.addEventListener("click", function () {
+      const target = document.getElementById("question-card-" + question.uid);
+      if (target) {
+        target.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
+    });
+
+    actions.appendChild(jumpButton);
+    body.appendChild(prompt);
+    body.appendChild(submitted);
+    body.appendChild(answer);
+    body.appendChild(explanation);
+    body.appendChild(actions);
+
+    card.appendChild(header);
+    card.appendChild(body);
+    return card;
+  }
+
   function evaluateQuestion(question, rawValue) {
     const submittedValue = normalizeSubmittedValue(rawValue);
 
@@ -546,11 +681,13 @@
         isCorrect: false,
         submittedValue: submittedValue,
       };
+      persistState();
       renderQuiz();
       return;
     }
 
     state.results[question.uid] = gradeQuestion(question, submittedValue);
+    persistState();
 
     renderQuiz();
     const resultElement = document.getElementById("result-" + question.uid);
@@ -679,6 +816,121 @@
     return first.every(function (value, index) {
       return value === second[index];
     });
+  }
+
+  function getSubmittedText(question, result) {
+    if (!result) {
+      return "제출 기록 없음";
+    }
+
+    if (question.type === "multiple") {
+      const choices = Array.isArray(question.choices) ? question.choices : [];
+      const selectedIndex = Number(result.submittedValue);
+      const choice = choices[selectedIndex];
+      return choice ? selectedIndex + 1 + "번 - " + choice : String(result.submittedValue);
+    }
+
+    if (question.type === "multiSelect") {
+      const choices = Array.isArray(question.choices) ? question.choices : [];
+      const submittedValues = Array.isArray(result.submittedValue) ? result.submittedValue : [];
+      const labels = submittedValues
+        .map(function (value) {
+          const selectedIndex = Number(value);
+          const choice = choices[selectedIndex];
+          return choice ? selectedIndex + 1 + "번 - " + choice : null;
+        })
+        .filter(Boolean);
+
+      return labels.join(" / ") || "선택한 보기 없음";
+    }
+
+    if (question.type === "tf") {
+      const labels = question.labels || ["T", "F"];
+      const selectedIndex = Number(result.submittedValue);
+      return labels[selectedIndex] || String(result.submittedValue);
+    }
+
+    if (Array.isArray(result.submittedValue)) {
+      return result.submittedValue.join(", ");
+    }
+
+    return String(result.submittedValue || "입력 없음");
+  }
+
+  function normalizeChapterNumbers(chapterNumbers) {
+    const source = Array.isArray(chapterNumbers) ? chapterNumbers : [];
+    const unique = new Set();
+
+    source.forEach(function (chapterNumber) {
+      const normalized = Number(chapterNumber);
+      if (chapterOrder.includes(normalized)) {
+        unique.add(normalized);
+      }
+    });
+
+    return chapterOrder.filter(function (chapterNumber) {
+      return unique.has(chapterNumber);
+    });
+  }
+
+  function persistState() {
+    if (!window.localStorage) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          selectedChapters: normalizeChapterNumbers(Array.from(state.selectedChapters)),
+          loadedChapters: normalizeChapterNumbers(state.loadedChapters),
+          results: state.results,
+        })
+      );
+    } catch (error) {
+      // Ignore storage failures and keep the app usable.
+    }
+  }
+
+  function restorePersistedState() {
+    if (!window.localStorage) {
+      return;
+    }
+
+    try {
+      const storedValue = window.localStorage.getItem(STORAGE_KEY);
+      if (!storedValue) {
+        return;
+      }
+
+      const parsed = JSON.parse(storedValue);
+      const selectedChapters = normalizeChapterNumbers(parsed.selectedChapters);
+      const loadedChapters = normalizeChapterNumbers(parsed.loadedChapters);
+
+      state.selectedChapters = new Set(selectedChapters);
+      state.loadedChapters = loadedChapters;
+      state.results =
+        parsed && parsed.results && typeof parsed.results === "object" ? parsed.results : {};
+
+      if (state.selectedChapters.size === 0 && state.loadedChapters.length > 0) {
+        state.loadedChapters.forEach(function (chapterNumber) {
+          state.selectedChapters.add(chapterNumber);
+        });
+      }
+    } catch (error) {
+      state.selectedChapters = new Set();
+      state.loadedChapters = [];
+      state.results = {};
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function normalizeText(value) {

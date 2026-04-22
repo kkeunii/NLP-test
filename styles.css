@@ -114,7 +114,8 @@ body::before {
 
 .selector-panel,
 .status-panel,
-.quiz-panel {
+.quiz-panel,
+.review-panel {
   padding: 24px;
 }
 
@@ -308,6 +309,11 @@ button:active {
   gap: 16px;
 }
 
+.review-list {
+  display: grid;
+  gap: 14px;
+}
+
 .quiz-card {
   padding: 22px;
   border-radius: 22px;
@@ -327,6 +333,61 @@ button:active {
 
 .quiz-card.pending {
   border-color: rgba(155, 122, 53, 0.38);
+}
+
+.review-card {
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(178, 74, 50, 0.2);
+  background:
+    linear-gradient(160deg, rgba(255, 251, 247, 0.96), rgba(248, 232, 224, 0.9)),
+    var(--panel-strong);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.review-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.review-body {
+  display: grid;
+  gap: 10px;
+}
+
+.review-prompt,
+.review-copy {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.review-copy strong {
+  color: var(--brand-deep);
+}
+
+.review-actions {
+  margin-top: 12px;
+}
+
+.link-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--brand-deep);
+  background: rgba(255, 247, 236, 0.95);
+  border: 1px solid rgba(138, 63, 35, 0.18);
+  font-weight: 700;
 }
 
 .question-topline {
@@ -506,7 +567,8 @@ button:active {
   .hero,
   .selector-panel,
   .status-panel,
-  .quiz-panel {
+  .quiz-panel,
+  .review-panel {
     padding: 20px;
     border-radius: 22px;
   }

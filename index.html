@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>시험 대비 문제 풀이</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Lightweight Study Site</p>
+        <h1>시험 대비 문제 풀이</h1>
+        <p class="hero-copy">
+          장을 고르고 바로 풀어보세요. 객관식, 복수선택, 빈칸, OX, 계산형은
+          즉시 채점되고, 서술형과 적용형은 키워드 기반 참고 채점과 모범답안을
+          함께 볼 수 있습니다.
+        </p>
+      </header>
+
+      <main class="layout">
+        <section class="panel selector-panel" aria-labelledby="chapter-selection-title">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">Chapter Select</p>
+              <h2 id="chapter-selection-title">풀고 싶은 장 선택</h2>
+            </div>
+            <div class="toolbar">
+              <button type="button" class="ghost-button" id="select-all-button">
+                전체 선택
+              </button>
+              <button type="button" class="ghost-button" id="clear-all-button">
+                전체 해제
+              </button>
+            </div>
+          </div>
+
+          <div id="chapter-grid" class="chapter-grid" aria-live="polite"></div>
+
+          <div class="selector-footer">
+            <div class="selection-summary" id="selection-summary">
+              선택한 장이 없습니다.
+            </div>
+            <div class="selector-actions">
+              <button type="button" class="secondary-button" id="reset-progress-button">
+                풀이 상태 초기화
+              </button>
+              <button type="button" class="primary-button" id="start-button">
+                선택한 장 시작
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel status-panel" aria-labelledby="progress-title">
+          <div class="panel-header compact">
+            <div>
+              <p class="section-kicker">Progress</p>
+              <h2 id="progress-title">풀이 현황</h2>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span class="stat-label">전체 문제</span>
+              <strong class="stat-value" id="total-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">풀어본 문제</span>
+              <strong class="stat-value" id="attempted-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">맞춘 문제</span>
+              <strong class="stat-value" id="correct-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">정답률</span>
+              <strong class="stat-value" id="accuracy-count">0%</strong>
+            </article>
+          </div>
+
+          <p class="status-note" id="status-note">
+            문제 파일을 채우면 선택한 장의 문제가 여기에 바로 반영됩니다.
+          </p>
+        </section>
+      </main>
+
+      <section class="panel quiz-panel" aria-labelledby="quiz-title">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Quiz</p>
+            <h2 id="quiz-title">문제 풀이</h2>
+          </div>
+        </div>
+
+        <div id="quiz-empty-state" class="empty-state">
+          아직 불러온 문제가 없습니다. 위에서 장을 선택한 뒤 시작 버튼을 눌러주세요.
+        </div>
+
+        <div id="quiz-list" class="quiz-list"></div>
+      </section>
+    </div>
+
+    <script src="./chapters/ch1.js"></script>
+    <script src="./chapters/ch2.js"></script>
+    <script src="./chapters/ch3.js"></script>
+    <script src="./chapters/ch4.js"></script>
+    <script src="./chapters/ch5.js"></script>
+    <script src="./chapters/ch6.js"></script>
+    <script src="./chapters/ch7.js"></script>
+    <script src="./chapters/ch8.js"></script>
+    <script src="./chapters/ch9.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -98,10 +98,10 @@ unigram과 bigram Laplace smoothing에 대한 설명으로 옳지 않은 것은?
       prompt: `Q7. Which statement correctly describes the difference between interpolation and backoff?
 Interpolation과 Backoff의 차이를 올바르게 설명한 것은?`,
       choices: [
-        "Interpolation uses only unigram probabilities, while backoff uses only trigram probabilities.",
-        "Interpolation mixes probabilities from multiple n-gram sizes, while backoff moves to a lower-order n-gram only when the higher-order n-gram has zero count.",
-        "Backoff always averages trigram, bigram, and unigram probabilities.",
-        "Interpolation cannot use weights.",
+        "Interpolation uses only unigram probabilities, while backoff uses only trigram probabilities. / Interpolation은 unigram 확률만 사용하고, backoff는 trigram 확률만 사용한다.",
+        "Interpolation mixes probabilities from multiple n-gram sizes, while backoff moves to a lower-order n-gram only when the higher-order n-gram has zero count. / Interpolation은 여러 차수의 n-gram 확률을 섞고, backoff는 높은 차수 n-gram의 count가 0일 때만 낮은 차수로 내려간다.",
+        "Backoff always averages trigram, bigram, and unigram probabilities. / Backoff는 항상 trigram, bigram, unigram 확률을 평균낸다.",
+        "Interpolation cannot use weights. / Interpolation은 weight를 사용할 수 없다.",
       ],
       correctIndex: 1,
       explanation:
@@ -113,10 +113,10 @@ Interpolation과 Backoff의 차이를 올바르게 설명한 것은?`,
       prompt: `Q8. What is the key idea of conditional interpolation?
 Conditional interpolation의 핵심 아이디어는 무엇인가?`,
       choices: [
-        "It always uses the same fixed weights regardless of context.",
-        "It ignores lower-order n-grams completely.",
-        "It changes interpolation weights depending on the context.",
-        "It sets all unseen n-grams to zero.",
+        "It always uses the same fixed weights regardless of context. / 문맥과 상관없이 항상 같은 고정 weight를 사용한다.",
+        "It ignores lower-order n-grams completely. / 낮은 차수 n-gram을 완전히 무시한다.",
+        "It changes interpolation weights depending on the context. / 문맥에 따라 interpolation weight를 바꾼다.",
+        "It sets all unseen n-grams to zero. / 보지 못한 모든 n-gram의 확률을 0으로 둔다.",
       ],
       correctIndex: 2,
       explanation:
@@ -128,10 +128,10 @@ Conditional interpolation의 핵심 아이디어는 무엇인가?`,
       prompt: `Q9. What is the role of α in Katz Backoff?
 Katz Backoff에서 α의 역할은 무엇인가?`,
       choices: [
-        "It counts the number of words in the vocabulary.",
-        "It redistributes discounted probability mass to lower-order n-grams.",
-        "It removes all unseen n-grams from the model.",
-        "It replaces all probabilities with uniform probabilities.",
+        "It counts the number of words in the vocabulary. / vocabulary 안의 단어 수를 센다.",
+        "It redistributes discounted probability mass to lower-order n-grams. / discount되어 남은 확률 질량을 낮은 차수 n-gram에 재분배한다.",
+        "It removes all unseen n-grams from the model. / 보지 못한 n-gram을 모델에서 제거한다.",
+        "It replaces all probabilities with uniform probabilities. / 모든 확률을 균등 확률로 바꾼다.",
       ],
       correctIndex: 1,
       explanation:
@@ -143,10 +143,10 @@ Katz Backoff에서 α의 역할은 무엇인가?`,
       prompt: `Q10. What is the main intuition behind Kneser-Ney smoothing?
 Kneser-Ney smoothing의 핵심 직관은 무엇인가?`,
       choices: [
-        "A word is important only if it appears frequently in the whole corpus.",
-        "Unseen n-grams should always receive probability 0.",
-        "A good lower-order probability should consider how many different contexts a word appears in.",
-        "Kneser-Ney does not use discounting.",
+        "A word is important only if it appears frequently in the whole corpus. / 어떤 단어는 전체 corpus에서 자주 등장할 때만 중요하다.",
+        "Unseen n-grams should always receive probability 0. / 보지 못한 n-gram은 항상 확률 0을 받아야 한다.",
+        "A good lower-order probability should consider how many different contexts a word appears in. / 좋은 낮은 차수 확률은 그 단어가 얼마나 다양한 문맥에서 등장했는지를 고려해야 한다.",
+        "Kneser-Ney does not use discounting. / Kneser-Ney는 discounting을 사용하지 않는다.",
       ],
       correctIndex: 2,
       explanation:
@@ -158,10 +158,10 @@ Kneser-Ney smoothing의 핵심 직관은 무엇인가?`,
       prompt: `Q11. In the "york" vs "mocha" example, why can "mocha" be a better continuation than "york" after "tall nonfat decaf peppermint"?
 "york"와 "mocha" 예시에서 왜 mocha가 더 좋은 continuation일 수 있는가?`,
       choices: [
-        "Because york never appears in any corpus.",
-        "Because york may be frequent overall but mostly appears after new, while mocha can appear in more relevant contexts.",
-        "Because Kneser-Ney always prefers rare words.",
-        "Because mocha has zero probability.",
+        "Because york never appears in any corpus. / york가 어떤 corpus에도 전혀 등장하지 않기 때문이다.",
+        "Because york may be frequent overall but mostly appears after new, while mocha can appear in more relevant contexts. / york는 전체 빈도는 높아도 주로 new 뒤에만 나오고, mocha는 더 관련 있는 다양한 문맥에서 나타날 수 있기 때문이다.",
+        "Because Kneser-Ney always prefers rare words. / Kneser-Ney는 항상 드문 단어를 선호하기 때문이다.",
+        "Because mocha has zero probability. / mocha의 확률이 0이기 때문이다.",
       ],
       correctIndex: 1,
       explanation:
@@ -173,10 +173,10 @@ Kneser-Ney smoothing의 핵심 직관은 무엇인가?`,
       prompt: `Q12. Which of the following is NOT true about Stupid Backoff?
 Stupid Backoff에 대한 설명으로 옳지 않은 것은?`,
       choices: [
-        "It tries to make the language model a true normalized probability distribution.",
-        "It does not discount higher-order probabilities.",
-        "If a higher-order n-gram has zero count, it backs off to a lower-order n-gram with a fixed weight.",
-        "It is usually written as a score S, not a probability P.",
+        "It tries to make the language model a true normalized probability distribution. / 언어모델을 진짜 정규화된 확률분포로 만들려고 한다.",
+        "It does not discount higher-order probabilities. / 높은 차수 n-gram 확률을 discount하지 않는다.",
+        "If a higher-order n-gram has zero count, it backs off to a lower-order n-gram with a fixed weight. / 높은 차수 n-gram의 count가 0이면 fixed weight를 곱해 낮은 차수 n-gram으로 내려간다.",
+        "It is usually written as a score S, not a probability P. / 보통 확률 P가 아니라 score S로 쓴다.",
       ],
       correctIndex: 0,
       explanation:

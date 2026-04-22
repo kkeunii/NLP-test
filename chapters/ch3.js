@@ -101,18 +101,14 @@ N = 개체명 수, V = 동사, |V| = 벡터 크기`,
       id: "3-6",
       type: "multiSelect",
       prompt: `Q1-(6) Select all that can change token or type counts.
-token 수 또는 type 수를 바꿀 수 있는 것을 모두 고르시오.`,
+token 수를 바꿀 수 있는 것을 고르시오.`,
       choices: [
-        `Treating punctuation as separate tokens
-구두점을 별도 token으로 세는 것`,
-        `Lowercasing all words
-모든 단어를 소문자로 바꾸는 것`,
-        `Lemmatizing cats to cat
-cats를 cat으로 lemmatization하는 것`,
-        `Changing the font size of the text
-텍스트의 글자 크기를 바꾸는 것`,
+        `Treating punctuation as separate tokens 구두점을 별도 token으로 세는 것`,
+        `Lowercasing all words 모든 단어를 소문자로 바꾸는 것`,
+        `Lemmatizing cats to cat cats를 cat으로 lemmatization하는 것`,
+        `Changing the font size of the text 텍스트의 글자 크기를 바꾸는 것`,
       ],
-      correctIndexes: [0, 1, 2],
+      correctIndexes: 1,
       explanation:
         "구두점 분리, lowercasing, lemmatization은 token/type 수를 바꿀 수 있지만 폰트 크기는 그렇지 않습니다.",
     },

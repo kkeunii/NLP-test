@@ -110,7 +110,7 @@ token 수를 바꿀 수 있는 것을 고르시오.`,
       ],
       correctIndexes: 1,
       explanation:
-        "구두점 분리, lowercasing, lemmatization은 token/type 수를 바꿀 수 있지만 폰트 크기는 그렇지 않습니다.",
+        "구두점 분리는 token 수를 바꿀 수 있지만 폰트 크기는 그렇지 않습니다.",
     },
     {
       id: "3-7",
